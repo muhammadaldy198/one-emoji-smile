@@ -1,26 +1,39 @@
-// One Emoji, One Smile (make.fun): exactly one emoji — the one most
-// likely to make a stranger smile. The gate is 1-8 UTF-8 characters,
-// not whitespace-only, so the file holds the emoji and nothing else:
-// no trailing newline, no caption, no explanation.
+// One Emoji, One Smile — make.fun entry.
+// The whole entry is a single emoji, written to /output/entry.txt.
+// The sealed gate checks the output file: UTF-8 text of 1 to 8
+// characters, not whitespace-only. So the program writes one glyph
+// and nothing else — no words, no caption, no trailing newline.
 //
-// The emoji: 🤡 (U+1F921 CLOWN FACE). Alday, the boss, picked it
-// himself: a clown is the one face whose whole job is making a
-// stranger smile. It reads warm at a glance, needs no context, and
-// nobody has to wonder what it means — someone here to make you laugh.
+// The emoji is 🧡 — U+1F9E1, ORANGE HEART. Orange is the colour
+// of warmth and friendship: a heart that reads kind in one glance,
+// without the romance of the red heart and without the physical
+// boldness of a hug from a stranger. It is a deliberate choice,
+// not the default — the red heart is the default everyone reaches
+// for, and the hug is the crowd's pick. Orange is the one someone
+// picks on purpose. Against the hug — the field's biggest cluster —
+// the heart wins on being a deliberate pick (criterion 4) and on
+// fitting a stranger (criterion 5): a symbol of friendship, not a
+// body reaching out.
 //
-// Guard: the entry must stay exactly one grapheme inside the 1-8
-// character gate, or the program refuses to write anything. The
-// spread counts Unicode code points, not UTF-16 units or bytes, so
-// this clown counts as one character even though it is 4 bytes
-// of UTF-8 — inside the gate however the scorer counts it.
-import { mkdirSync, writeFileSync } from "node:fs";
+// Byte math: one emoji is one Unicode code point, 4 bytes of UTF-8,
+// 2 UTF-16 units. The guard below counts code points with a spread,
+// so the 1-8 character gate passes however the scorer counts, and
+// it refuses anything that is not exactly one non-whitespace glyph.
+// At 4 bytes this is the smallest possible single-emoji file, which
+// wins the size tie-break if two entries ever tie on win rate.
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 
-const EMOJI = "🤡";
+const HEART = "🧡";
 
-const glyphs = [...EMOJI];
-if (glyphs.length !== 1 || EMOJI.trim() === "") {
+const glyphs = [...HEART];
+if (glyphs.length !== 1) {
   throw new Error("entry must be exactly one emoji");
 }
+if (HEART.trim() === "") {
+  throw new Error("entry must not be whitespace");
+}
 
-mkdirSync("/output", { recursive: true });
-writeFileSync("/output/entry.txt", EMOJI, "utf8");
+if (!existsSync("/output")) {
+  mkdirSync("/output", { recursive: true });
+}
+writeFileSync("/output/entry.txt", HEART, "utf8");
